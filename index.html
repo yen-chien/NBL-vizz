@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/vega@5.22.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.5.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.21.0"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/app.js"></script>
+  
+  <link rel="stylesheet" type="text/css" href="css/styles.css" media="all">
+  <title>NBL Data Visualization - Index</title>
+</head>
+<body>
+  
+<h1>NBL Teams Map - 2024-25 Season</h1>
+
+<div id="choropleth_map"></div>
+
+<h2>NBL Player Statistics - 2024-25 Season</h2>
+<div style="margin: 20px 0;">
+  <label for="team-select" style="font-weight: bold; margin-right: 10px;">Select Team:</label>
+  <select id="team-select" style="padding: 8px; font-size: 14px; min-width: 250px;">
+    <option value="">Loading teams...</option>
+  </select>
+</div>
+<div id="stats_table"></div>
+
+<h2>Player Performance Comparison</h2>
+<div style="display: flex; gap: 40px; margin: 20px 0;">
+  <div style="flex: 1;">
+    <div style="margin-bottom: 10px;">
+      <label for="player-select" style="font-weight: bold; margin-right: 10px;">Player 1:</label>
+      <select id="player-select" style="padding: 8px; font-size: 14px; width: 100%;">
+        <option value="">Loading players...</option>
+      </select>
+    </div>
+    <div id="radar_chart1" style="margin: 10px 0;">
+      <p style="text-align: center; color: #666;">Select a player</p>
+    </div>
+  </div>
+  <div style="flex: 1;">
+    <div style="margin-bottom: 10px;">
+      <label for="player-select2" style="font-weight: bold; margin-right: 10px;">Player 2:</label>
+      <select id="player-select2" style="padding: 8px; font-size: 14px; width: 100%;">
+        <option value="">Loading players...</option>
+      </select>
+    </div>
+    <div id="radar_chart2" style="margin: 10px 0;">
+      <p style="text-align: center; color: #666;">Select a player</p>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  // Initialize the map
+  const mapSpec = "js/nbl_teams_map.vg.json";
+  vegaEmbed('#choropleth_map', mapSpec).then(function(result) {
+    const view = result.view;
+    
+    // Handle map clicks
+    view.addEventListener('click', function(event, item) {
+      console.log('Click event fired', item);
+      
+      // Handle clicks on team markers (circles)
+      if (item && item.datum && item.datum.team) {
+        const teamName = item.datum.team;
+        console.log('Clicked team:', teamName);
+        selectTeamByName(teamName);
+        return;
+      }
+      
+      // Handle clicks on state regions
+      if (item && item.datum && item.datum.properties) {
+        // Map state/region names to team names
+        const stateToTeam = {
+          'Victoria': 'Melbourne United',
+          'New South Wales': 'Sydney Kings',
+          'Queensland': 'Brisbane Bullets',
+          'Western Australia': 'Perth Wildcats',
+          'South Australia': 'Adelaide 36ers',
+          'Tasmania': 'Tasmania JackJumpers',
+          'New Zealand': 'New Zealand Breakers'
+        };
+        
+        // Try to get the state name from properties
+        const stateName = item.datum.properties.name;
+        console.log('Clicked state:', stateName);
+        
+        if (stateName && stateToTeam[stateName]) {
+          const teamName = stateToTeam[stateName];
+          selectTeamByName(teamName);
+        }
+      }
+    });
+  }).catch(console.error);
+
+  // Initialize data loading
+  loadCSVData();
+</script>
+
+</body>
+</html>
