@@ -1,0 +1,10 @@
+state,state_code,team_count,total_shots,field_goal_pct,three_pt_shots
+South Australia,SA,1,1200,0.483,380
+Queensland,QL,2,2300,0.485,720
+New South Wales,NS,2,2400,0.492,750
+Victoria,VI,2,2370,0.494,680
+Western Australia,WA,1,1210,0.496,360
+Tasmania,TS,1,1185,0.489,355
+Northern Territory,NT,0,0,0,0
+Australian Capital Territory,CT,0,0,0,0
+New Zealand,NZ,1,1160,0.487,340
