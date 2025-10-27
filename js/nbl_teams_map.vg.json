@@ -1,0 +1,136 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 1000,
+  "height": 750,
+  "title": {
+    "text": "NBL Team Distribution Across Australia & New Zealand - 2024-25 Season",
+    "fontSize": 18,
+    "fontWeight": "bold",
+    "offset": 10
+  },
+  "projection": {
+    "type": "mercator",
+    "scale": 750,
+    "center": [148, -35]
+  },
+  "layer": [
+    {
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#999",
+        "strokeWidth": 2,
+        "fill": "#e0e0e0"
+      },
+      "data": {
+        "url": "js/ne_10m_admin_1_states_provinces.topojson",
+        "format": {"type": "topojson", "feature": "ne_10m_admin_1_states_provinces"}
+      },
+      "transform": [
+        {
+          "filter": {
+            "field": "properties.adm0_a3",
+            "oneOf": ["AUS", "NZL"]
+          }
+        }
+      ],
+      "encoding": {
+        "tooltip": [
+          {"field": "properties.name", "type": "nominal", "title": "State/Territory"}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "geoshape",
+        "stroke": "#666",
+        "strokeWidth": 2.5
+      },
+      "data": {
+        "url": "js/ne_10m_admin_1_states_provinces.topojson",
+        "format": {"type": "topojson", "feature": "ne_10m_admin_1_states_provinces"}
+      },
+      "transform": [
+        {
+          "filter": {
+            "field": "properties.adm0_a3",
+            "oneOf": ["AUS", "NZL"]
+          }
+        },
+        {
+          "calculate": "datum.properties.adm0_a3 === 'NZL' ? 'NZ' : datum.properties.postal",
+          "as": "lookup_key"
+        },
+        {
+          "lookup": "lookup_key",
+          "from": {
+            "data": {"url": "data/state_team_stats.csv"},
+            "key": "state_code",
+            "fields": ["team_count", "total_shots", "field_goal_pct"]
+          },
+          "default": {"team_count": 0}
+        }
+      ],
+      "encoding": {
+        "color": {
+          "field": "team_count",
+          "type": "quantitative",
+          "scale": {
+            "domain": [0, 1, 2],
+            "range": ["#dad7cd", "#a3b18a", "#588157"]
+          },
+          "legend": {
+            "title": "Number of Teams",
+            "direction": "vertical",
+            "values": [0, 1, 2]
+          }
+        },
+        "tooltip": [
+          {"field": "properties.name", "type": "nominal", "title": "State/Territory"},
+          {"field": "team_count", "type": "quantitative", "title": "Teams"},
+          {"field": "total_shots", "type": "quantitative", "title": "Total Shots"},
+          {"field": "field_goal_pct", "type": "quantitative", "title": "FG%", "format": ".2f"}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "size": 100,
+        "stroke": "#d32f2f",
+        "strokeWidth": 2.5,
+        "fill": "#fff3e0",
+        "fillOpacity": 0.95
+      },
+      "data": {"url": "data/team_locations.csv"},
+      "encoding": {
+        "longitude": {"field": "longitude", "type": "quantitative"},
+        "latitude": {"field": "latitude", "type": "quantitative"},
+        "tooltip": [
+          {"field": "team", "type": "nominal", "title": "Team"},
+          {"field": "city", "type": "nominal", "title": "City"},
+          {"field": "state", "type": "nominal", "title": "State"}
+        ]
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "fontSize": 12,
+        "fontWeight": "bold",
+        "dx": 16,
+        "dy": -14,
+        "fill": "#b71c1c"
+      },
+      "data": {"url": "data/team_locations.csv"},
+      "encoding": {
+        "longitude": {"field": "longitude", "type": "quantitative"},
+        "latitude": {"field": "latitude", "type": "quantitative"},
+        "text": {"field": "team", "type": "nominal"}
+      }
+    }
+  ],
+  "config": {
+    "background": "white"
+  }
+}
+
